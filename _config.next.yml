@@ -103,14 +103,11 @@ open_graph:
 # External url should start with http:// or https://
 menu:
   home: / || fa fa-home
-  Mumbles: /mumbles/ || fa fa-cat
-  CS: /cs_notes/ || fa fa-laptop-code
-  MATH: /math_notes/ || fa fa-equals
-  PHYSICS: /physics_notes/ || fa fa-globe
-  Void: /void/ || fa fa-infinity
-  #schedule: /schedule/ || fa fa-calendar
-  #sitemap: /sitemap.xml || fa fa-sitemap
-  #commonweal: /404/ || fa fa-heartbeat
+  MUMBLES: /categories/Mumbles/ || fa fa-cat
+  CS: /categories/CS/ || fa fa-laptop-code
+  MATH: /categories/MATH/ || fa fa-equals
+  PHYSICS: /categories/PHYSICS/ || fa fa-globe
+  VOID: /categories/void/ || fa fa-infinity
 
 # Enable / Disable menu icons / item badges.
 menu_settings:
