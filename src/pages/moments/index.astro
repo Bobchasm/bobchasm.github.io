@@ -6,7 +6,7 @@ import MomentCard from '../../components/MomentCard.astro';
 const moments = (await getCollection('moments')).filter((item) => !item.data.draft).sort((a, b) => +b.data.date - +a.data.date);
 ---
 
-<BaseLayout title="动态 | Bobchasm">
+<BaseLayout title="Moments | Bobchasm">
   <div class="site-shell page-title">
     <div class="eyebrow">Moments</div>
     <h1>图文、视频和短文字</h1>

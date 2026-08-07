@@ -6,13 +6,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const projects = (await getCollection('projects')).filter((item) => !item.data.draft).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
 ---
 
-<BaseLayout title="项目 | Bobchasm">
+<BaseLayout title="Projects | Bobchasm">
   <div class="site-shell page-title">
     <div class="eyebrow">Projects</div>
     <h1>想展示的项目和实验</h1>
     <p>每个项目可以关联仓库、演示地址、技术栈，也可以把 README 内容整理成展示页。</p>
   </div>
-  <section class="site-shell grid two">
+  <section class="site-shell grid two list-floor">
     {projects.map((item) => (
       <article class="card project-card">
         <div>

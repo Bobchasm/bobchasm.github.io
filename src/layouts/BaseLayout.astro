@@ -13,12 +13,11 @@ const {
 } = Astro.props;
 
 const nav = [
-  ['/', '首页'],
-  ['/blog/', '博客'],
-  ['/notes/', '笔记'],
-  ['/projects/', '项目'],
-  ['/moments/', '动态'],
-  ['/studio/', '入口']
+  ['/space/', 'Home'],
+  ['/blog/', 'Blog'],
+  ['/notes/', 'Notes'],
+  ['/projects/', 'Projects'],
+  ['/moments/', 'Moments']
 ];
 
 const current = Astro.url.pathname;
@@ -39,10 +38,6 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
     {showHeader && (
       <header class="site-header">
         <div class="site-shell nav">
-          <a class="brand" href="/" aria-label="Bobchasm home">
-            <span class="brand-mark">BC</span>
-            <span>Bobchasm</span>
-          </a>
           <nav class="nav-links" aria-label="Primary">
             {nav.map(([href, label]) => (
               <a href={href} aria-current={current === href ? 'page' : undefined}>{label}</a>

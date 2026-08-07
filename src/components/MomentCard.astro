@@ -2,11 +2,12 @@
 import { Heart, MessageCircle } from 'lucide-astro';
 
 const { item } = Astro.props;
-const { date, text, images = [], video, mood } = item.data;
+const { title, date, text, images = [], video, mood } = item.data;
 ---
 
 <article class="card moment-card">
   <div class="meta">{date.toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+  <h3><a href={`/moments/${item.slug}/`}>{title}</a></h3>
   {mood && <div class="eyebrow">{mood}</div>}
   {text && <p>{text}</p>}
   {images.length > 0 && (

@@ -40,6 +40,7 @@ const projects = defineCollection({
 const moments = defineCollection({
   type: 'content',
   schema: z.object({
+    title: z.string().default('Moment'),
     date: z.coerce.date(),
     text: z.string().default(''),
     images: z.array(z.string()).default([]),

@@ -1,0 +1,238 @@
+---
+const { keywords = [] } = Astro.props;
+const palette = ['#d3eee8', '#c9e8f2', '#d8f0dc', '#cfe7f7'];
+---
+
+<section class="keyword-cloud" data-keyword-cloud aria-label="Keywords">
+  {keywords.map((keyword, index) => (
+    <button
+      class="keyword-bubble"
+      type="button"
+      data-index={index}
+      style={`--size: ${keyword.size || 88}px; --bubble-bg: ${palette[(keyword.tone || 0) % palette.length]};`}
+    >
+      {keyword.label}
+    </button>
+  ))}
+</section>
+
+<script>
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  document.querySelectorAll('[data-keyword-cloud]').forEach((cloud) => {
+    const bubbles = Array.from(cloud.querySelectorAll('.keyword-bubble'));
+    let width = 0;
+    let height = 0;
+    let items = [];
+    let dragging = null;
+
+    const layout = () => {
+      const rect = cloud.getBoundingClientRect();
+      width = rect.width;
+      height = rect.height;
+
+      items = bubbles.map((el, index) => {
+        const radius = el.offsetWidth / 2;
+        return {
+          el,
+          radius,
+          x: radius + ((index * 97) % Math.max(1, width - radius * 2)),
+          y: radius + ((index * 53) % Math.max(1, height - radius * 2)),
+          vx: (index % 2 === 0 ? 0.22 : -0.18) + index * 0.006,
+          vy: (index % 3 === 0 ? -0.16 : 0.2) - index * 0.005,
+          originX: 0,
+          originY: 0
+        };
+      });
+    };
+
+    const draw = () => {
+      items.forEach((item) => {
+        item.el.style.transform = `translate(${item.x - item.radius}px, ${item.y - item.radius}px)`;
+      });
+    };
+
+    const keepAlive = (item) => {
+      const speed = Math.hypot(item.vx, item.vy);
+      if (speed < 0.16) {
+        item.vx += (Math.random() - 0.5) * 0.16;
+        item.vy += (Math.random() - 0.5) * 0.16;
+      }
+    };
+
+    const limitSpeed = (item) => {
+      const speed = Math.hypot(item.vx, item.vy);
+      const maxSpeed = 0.72;
+      if (speed > maxSpeed) {
+        item.vx = (item.vx / speed) * maxSpeed;
+        item.vy = (item.vy / speed) * maxSpeed;
+      }
+    };
+
+    const tick = () => {
+      items.forEach((item) => {
+        if (dragging === item) return;
+
+        item.x += item.vx;
+        item.y += item.vy;
+
+        if (item.x < item.radius || item.x > width - item.radius) {
+          item.vx *= -1;
+          item.x = clamp(item.x, item.radius, width - item.radius);
+        }
+
+        if (item.y < item.radius || item.y > height - item.radius) {
+          item.vy *= -1;
+          item.y = clamp(item.y, item.radius, height - item.radius);
+        }
+      });
+
+      for (let i = 0; i < items.length; i += 1) {
+        for (let j = i + 1; j < items.length; j += 1) {
+          const a = items[i];
+          const b = items[j];
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const distance = Math.hypot(dx, dy) || 1;
+          const minDistance = a.radius + b.radius + 4;
+
+          if (distance < minDistance) {
+            const overlap = (minDistance - distance) * 0.34;
+            const nx = dx / distance;
+            const ny = dy / distance;
+
+            if (dragging !== a) {
+              a.x -= nx * overlap;
+              a.y -= ny * overlap;
+            }
+
+            if (dragging !== b) {
+              b.x += nx * overlap;
+              b.y += ny * overlap;
+            }
+
+            if (dragging === a) {
+              b.vx += nx * 0.18;
+              b.vy += ny * 0.18;
+            } else if (dragging === b) {
+              a.vx -= nx * 0.18;
+              a.vy -= ny * 0.18;
+            } else {
+              const avx = a.vx;
+              const avy = a.vy;
+              a.vx = b.vx * 0.84;
+              a.vy = b.vy * 0.84;
+              b.vx = avx * 0.84;
+              b.vy = avy * 0.84;
+            }
+          }
+        }
+      }
+
+      items.forEach((item) => {
+        if (dragging !== item) keepAlive(item);
+        limitSpeed(item);
+      });
+
+      draw();
+      requestAnimationFrame(tick);
+    };
+
+    bubbles.forEach((el) => {
+      el.addEventListener('pointerdown', (event) => {
+        const item = items.find((candidate) => candidate.el === el);
+        if (!item) return;
+
+        dragging = item;
+        item.originX = item.x;
+        item.originY = item.y;
+        item.lastX = item.x;
+        item.lastY = item.y;
+        item.lastT = performance.now();
+        el.setPointerCapture(event.pointerId);
+        el.classList.add('is-dragging');
+      });
+
+      el.addEventListener('pointermove', (event) => {
+        if (!dragging || dragging.el !== el) return;
+
+        const rect = cloud.getBoundingClientRect();
+        const targetX = event.clientX - rect.left;
+        const targetY = event.clientY - rect.top;
+        const dragRange = 120;
+
+        const nextX = clamp(targetX, Math.max(dragging.radius, dragging.originX - dragRange), Math.min(width - dragging.radius, dragging.originX + dragRange));
+        const nextY = clamp(targetY, Math.max(dragging.radius, dragging.originY - dragRange), Math.min(height - dragging.radius, dragging.originY + dragRange));
+        const now = performance.now();
+        const dt = Math.max(16, now - (dragging.lastT || now));
+
+        dragging.vx = ((nextX - (dragging.lastX || nextX)) / dt) * 16;
+        dragging.vy = ((nextY - (dragging.lastY || nextY)) / dt) * 16;
+        dragging.x = nextX;
+        dragging.y = nextY;
+        dragging.lastX = nextX;
+        dragging.lastY = nextY;
+        dragging.lastT = now;
+      });
+
+      el.addEventListener('pointerup', () => {
+        el.classList.remove('is-dragging');
+        dragging = null;
+      });
+
+      el.addEventListener('pointercancel', () => {
+        el.classList.remove('is-dragging');
+        dragging = null;
+      });
+    });
+
+    layout();
+    draw();
+    requestAnimationFrame(tick);
+    window.addEventListener('resize', layout);
+  });
+</script>
+
+<style>
+  .keyword-cloud {
+    position: relative;
+    min-height: 260px;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .keyword-bubble {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--size);
+    height: var(--size);
+    border: 1px solid rgba(7, 91, 96, 0.2);
+    border-radius: 50%;
+    background: var(--bubble-bg);
+    color: #075b60;
+    box-shadow: 0 14px 34px rgba(8, 63, 70, 0.12);
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    font: inherit;
+    font-size: clamp(0.72rem, 1.6vw, 0.98rem);
+    font-weight: 760;
+    text-align: center;
+    line-height: 1.15;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: box-shadow 160ms ease, border-color 160ms ease;
+  }
+
+  .keyword-bubble:hover,
+  .keyword-bubble.is-dragging {
+    border-color: rgba(7, 91, 96, 0.45);
+    box-shadow: 0 18px 42px rgba(8, 63, 70, 0.18);
+  }
+
+  .keyword-bubble.is-dragging {
+    cursor: grabbing;
+  }
+</style>

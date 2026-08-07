@@ -1,0 +1,34 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const moments = (await getCollection('moments')).filter((item) => !item.data.draft);
+  return moments.map((moment) => ({ params: { slug: moment.slug }, props: { moment } }));
+}
+
+const { moment } = Astro.props;
+const { Content } = await render(moment);
+---
+
+<BaseLayout title={`${moment.data.title} | Bobchasm`} description={moment.data.text}>
+  <article class="prose moment-detail">
+    <div class="eyebrow">Moment</div>
+    <h1>{moment.data.title}</h1>
+    <div class="meta">{moment.data.date.toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+    {moment.data.images.length > 0 && <img src={moment.data.images[0]} alt="" />}
+    {moment.data.video && <video src={moment.data.video} controls preload="metadata"></video>}
+    {moment.data.text && <p>{moment.data.text}</p>}
+    <Content />
+  </article>
+</BaseLayout>
+
+<style>
+  .moment-detail img,
+  .moment-detail video {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin: 22px 0;
+  }
+</style>
