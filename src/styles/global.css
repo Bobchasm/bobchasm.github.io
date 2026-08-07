@@ -1,15 +1,15 @@
 :root {
   color-scheme: light;
-  --paper: #fbfaf7;
+  --paper: #f7fbfa;
   --ink: #171717;
-  --muted: #65635f;
-  --line: #dfd9cf;
+  --muted: #5d6a68;
+  --line: #cfddd9;
   --panel: #ffffff;
-  --accent: #256d5a;
-  --accent-strong: #17483d;
-  --warm: #b34f2a;
-  --blue: #355c9a;
-  --shadow: 0 18px 50px rgba(33, 29, 23, 0.08);
+  --accent: #087c7a;
+  --accent-strong: #075b60;
+  --warm: #2d6f9f;
+  --blue: #256d9f;
+  --shadow: 0 18px 50px rgba(8, 63, 70, 0.08);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -48,8 +48,8 @@ video {
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid rgba(223, 217, 207, 0.82);
-  background: rgba(251, 250, 247, 0.88);
+  border-bottom: 1px solid rgba(207, 221, 217, 0.82);
+  background: rgba(247, 251, 250, 0.88);
   backdrop-filter: blur(18px);
 }
 
@@ -96,7 +96,7 @@ video {
 .nav-links a:hover,
 .nav-links a[aria-current="page"] {
   color: var(--ink);
-  background: #f0ece4;
+  background: #e8f3f1;
 }
 
 main {
@@ -276,7 +276,7 @@ main {
 }
 
 .prose code {
-  background: #efebe3;
+  background: #e8f3f1;
   border-radius: 6px;
   padding: 0.16em 0.34em;
 }
