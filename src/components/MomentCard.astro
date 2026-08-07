@@ -1,0 +1,61 @@
+---
+import { Heart, MessageCircle } from 'lucide-astro';
+
+const { item } = Astro.props;
+const { date, text, images = [], video, mood } = item.data;
+---
+
+<article class="card moment-card">
+  <div class="meta">{date.toLocaleString('zh-CN', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+  {mood && <div class="eyebrow">{mood}</div>}
+  {text && <p>{text}</p>}
+  {images.length > 0 && (
+    <div class="moment-media">
+      {images.map((src) => <img src={src} alt="" loading="lazy" />)}
+    </div>
+  )}
+  {video && <video src={video} controls preload="metadata"></video>}
+  <div class="moment-actions" aria-label="Interaction placeholders">
+    <button type="button" title="Like"><Heart size={18} /></button>
+    <button type="button" title="Comment"><MessageCircle size={18} /></button>
+  </div>
+</article>
+
+<style>
+  .moment-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  .moment-media {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+  }
+
+  .moment-media img,
+  video {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+
+  .moment-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .moment-actions button {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--muted);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+</style>

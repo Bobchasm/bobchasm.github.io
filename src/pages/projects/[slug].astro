@@ -1,0 +1,26 @@
+---
+import { getCollection, render } from 'astro:content';
+import { ExternalLink, Github } from 'lucide-astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).filter((item) => !item.data.draft);
+  return projects.map((project) => ({ params: { slug: project.slug }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout title={`${project.data.title} | BobChasm`} description={project.data.description}>
+  <article class="prose">
+    <div class="eyebrow">Project</div>
+    <h1>{project.data.title}</h1>
+    <p>{project.data.description}</p>
+    <div class="button-row">
+      {project.data.repo && <a class="button" href={project.data.repo} target="_blank" rel="noreferrer"><Github size={18} />Repo</a>}
+      {project.data.demo && <a class="button" href={project.data.demo} target="_blank" rel="noreferrer"><ExternalLink size={18} />Demo</a>}
+    </div>
+    <Content />
+  </article>
+</BaseLayout>

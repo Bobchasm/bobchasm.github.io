@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import { ArrowRight } from 'lucide-astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const notes = (await getCollection('notes')).filter((item) => !item.data.draft);
+const categories = [
+  ['cs', 'CS', '计算机、工程实践、工具链与问题复盘'],
+  ['math', 'Math', '数学学习、证明、题目和概念整理'],
+  ['physics', 'Physics', '物理笔记、直觉、模型与推导'],
+  ['void', 'Void', '暂时无法归类但值得留存的内容']
+];
+---
+
+<BaseLayout title="学习笔记 | BobChasm">
+  <div class="site-shell page-title">
+    <div class="eyebrow">Notes</div>
+    <h1>按学科和主题组织的学习记录</h1>
+    <p>笔记和博客分开：这里更偏知识沉淀、概念索引和长期维护。</p>
+  </div>
+  <section class="site-shell grid two">
+    {categories.map(([key, label, desc]) => {
+      const count = notes.filter((item) => item.data.category === key).length;
+      return (
+        <a class="card note-category" href={`/notes/${key}/`}>
+          <div class="eyebrow">{count} notes</div>
+          <h2>{label}</h2>
+          <p>{desc}</p>
+          <span><ArrowRight size={18} /></span>
+        </a>
+      );
+    })}
+  </section>
+</BaseLayout>
+
+<style>
+  .note-category {
+    min-height: 190px;
+    display: grid;
+    align-content: space-between;
+  }
+
+  .note-category span {
+    color: var(--accent);
+  }
+</style>

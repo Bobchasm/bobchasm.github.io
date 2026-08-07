@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import MomentCard from '../../components/MomentCard.astro';
+
+const moments = (await getCollection('moments')).filter((item) => !item.data.draft).sort((a, b) => +b.data.date - +a.data.date);
+---
+
+<BaseLayout title="动态 | BobChasm">
+  <div class="site-shell page-title">
+    <div class="eyebrow">Moments</div>
+    <h1>图文、视频和短文字</h1>
+    <p>比博客轻一点，比即时聊天慢一点，用来留住一些日常片段。</p>
+  </div>
+  <section class="site-shell grid two">
+    {moments.map((item) => <MomentCard item={item} />)}
+  </section>
+</BaseLayout>

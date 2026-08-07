@@ -1,0 +1,67 @@
+---
+import '../styles/global.css';
+import { ArrowUpRight } from 'lucide-astro';
+import OwnerDock from '../components/OwnerDock.astro';
+
+const {
+  title = 'BobChasm',
+  description = 'Personal homepage, notes, projects and moments.',
+  showHeader = true,
+  showOwnerDock = true,
+  footerId = 'site-footer',
+  footerLinks = []
+} = Astro.props;
+
+const nav = [
+  ['/', '首页'],
+  ['/blog/', '博客'],
+  ['/notes/', '笔记'],
+  ['/projects/', '项目'],
+  ['/moments/', '动态'],
+  ['/studio/', '入口']
+];
+
+const current = Astro.url.pathname;
+const lastUpdated = new Date().toISOString().slice(0, 10);
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body>
+    {showHeader && (
+      <header class="site-header">
+        <div class="site-shell nav">
+          <a class="brand" href="/" aria-label="BobChasm home">
+            <span class="brand-mark">BC</span>
+            <span>BobChasm</span>
+          </a>
+          <nav class="nav-links" aria-label="Primary">
+            {nav.map(([href, label]) => (
+              <a href={href} aria-current={current === href ? 'page' : undefined}>{label}</a>
+            ))}
+          </nav>
+        </div>
+      </header>
+    )}
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer" id={footerId}>
+      <div class="site-shell">
+        {footerLinks.length > 0 && (
+          <nav class="footer-links" aria-label="Footer links">
+            {footerLinks.map((link) => <a href={link.href}>{link.label}<ArrowUpRight size={13} /></a>)}
+          </nav>
+        )}
+        <span class="last-updated">Last updated: {lastUpdated}</span>
+      </div>
+    </footer>
+    {showOwnerDock && <OwnerDock />}
+  </body>
+</html>

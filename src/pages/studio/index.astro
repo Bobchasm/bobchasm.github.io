@@ -1,0 +1,203 @@
+---
+import { FileText, ImagePlus, NotebookTabs, Rocket, Send } from 'lucide-astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="发布 | BobChasm">
+  <div class="site-shell page-title">
+    <div class="eyebrow">Owner Studio</div>
+    <h1>发布内容</h1>
+    <p>当前是静态原型：先生成 Markdown 草稿。接入后端后，这里会直接保存、上传媒体并发布。</p>
+  </div>
+
+  <section class="site-shell studio-layout">
+    <form class="card composer" data-composer>
+      <div class="type-grid" role="radiogroup" aria-label="Content type">
+        <label class="type-option">
+          <input type="radio" name="type" value="blog" checked />
+          <FileText size={19} />
+          <span>博客</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="type" value="notes" />
+          <NotebookTabs size={19} />
+          <span>笔记</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="type" value="projects" />
+          <Rocket size={19} />
+          <span>项目</span>
+        </label>
+        <label class="type-option">
+          <input type="radio" name="type" value="moments" />
+          <ImagePlus size={19} />
+          <span>动态</span>
+        </label>
+      </div>
+
+      <label>
+        <span>标题</span>
+        <input name="title" type="text" placeholder="新的记录" />
+      </label>
+
+      <label>
+        <span>分类</span>
+        <select name="category">
+          <option value="cs">CS</option>
+          <option value="math">Math</option>
+          <option value="physics">Physics</option>
+          <option value="void">Void</option>
+        </select>
+      </label>
+
+      <label>
+        <span>标签</span>
+        <input name="tags" type="text" placeholder="Astro, Java, Debug" />
+      </label>
+
+      <label>
+        <span>正文</span>
+        <textarea name="body" rows="12" placeholder="写一点什么..."></textarea>
+      </label>
+
+      <div class="button-row">
+        <button class="button primary" type="submit"><Send size={18} />生成草稿</button>
+      </div>
+    </form>
+
+    <aside class="card preview">
+      <div class="eyebrow">Markdown Draft</div>
+      <pre data-preview>等待输入...</pre>
+    </aside>
+  </section>
+</BaseLayout>
+
+<script>
+  const composer = document.querySelector('[data-composer]');
+  const preview = document.querySelector('[data-preview]');
+
+  const formatDate = () => new Date().toISOString().slice(0, 10);
+
+  composer?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = new FormData(composer);
+    const type = String(data.get('type'));
+    const title = String(data.get('title') || '新的记录').trim();
+    const category = String(data.get('category') || 'cs');
+    const tags = String(data.get('tags') || '')
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    const body = String(data.get('body') || '').trim();
+
+    const frontmatter = {
+      blog: `---\ntitle: "${title}"\ndescription: ""\ndate: ${formatDate()}\ntags: ${JSON.stringify(tags)}\n---`,
+      notes: `---\ntitle: "${title}"\ndescription: ""\ndate: ${formatDate()}\ncategory: "${category}"\norder: 10\n---`,
+      projects: `---\ntitle: "${title}"\ndescription: ""\ndate: ${formatDate()}\nrepo: ""\ntech: ${JSON.stringify(tags)}\nfeatured: false\n---`,
+      moments: `---\ndate: ${new Date().toISOString()}\ntext: "${title}"\nimages: []\nmood: ""\n---`
+    }[type];
+
+    if (preview) {
+      preview.textContent = `${frontmatter}\n\n${body || '内容...'}`;
+    }
+  });
+</script>
+
+<style>
+  .studio-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.8fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .composer {
+    display: grid;
+    gap: 16px;
+  }
+
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .type-option {
+    min-height: 74px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    gap: 4px;
+    padding: 10px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .type-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .type-option:has(input:checked) {
+    color: var(--accent-strong);
+    border-color: rgba(37, 109, 90, 0.5);
+    background: #eef5f1;
+  }
+
+  label {
+    display: grid;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 13px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .preview {
+    position: sticky;
+    top: 92px;
+  }
+
+  .preview pre {
+    min-height: 360px;
+    margin: 12px 0 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #f4f1ea;
+    padding: 14px;
+    color: #2f2d29;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  @media (max-width: 860px) {
+    .studio-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .type-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .preview {
+      position: static;
+    }
+  }
+</style>

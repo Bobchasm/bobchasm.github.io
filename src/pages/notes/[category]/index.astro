@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+
+export const labels = { cs: 'CS', math: 'Math', physics: 'Physics', void: 'Void' };
+
+export async function getStaticPaths() {
+  return Object.keys(labels).map((category) => ({ params: { category } }));
+}
+
+const { category } = Astro.params;
+const notes = (await getCollection('notes'))
+  .filter((item) => !item.data.draft && item.data.category === category)
+  .sort((a, b) => a.data.order - b.data.order || +b.data.date - +a.data.date);
+---
+
+<BaseLayout title={`${labels[category]} 笔记 | BobChasm`}>
+  <div class="site-shell page-title">
+    <div class="eyebrow">Notes</div>
+    <h1>{labels[category]} 笔记</h1>
+    <p>持续补全中的学习索引。</p>
+  </div>
+  <section class="site-shell grid two">
+    {notes.map((item) => <ArticleCard item={item} href={`/notes/${category}/${item.slug}/`} />)}
+  </section>
+</BaseLayout>

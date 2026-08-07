@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import { ExternalLink, Github } from 'lucide-astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).filter((item) => !item.data.draft).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
+---
+
+<BaseLayout title="项目 | BobChasm">
+  <div class="site-shell page-title">
+    <div class="eyebrow">Projects</div>
+    <h1>想展示的项目和实验</h1>
+    <p>每个项目可以关联仓库、演示地址、技术栈，也可以把 README 内容整理成展示页。</p>
+  </div>
+  <section class="site-shell grid two">
+    {projects.map((item) => (
+      <article class="card project-card">
+        <div>
+          <div class="eyebrow">{item.data.featured ? 'Featured' : 'Project'}</div>
+          <h2><a href={`/projects/${item.slug}/`}>{item.data.title}</a></h2>
+          <p>{item.data.description}</p>
+          <div class="tags">{item.data.tech.map((tech) => <span class="tag">{tech}</span>)}</div>
+        </div>
+        <div class="button-row">
+          {item.data.repo && <a class="button" href={item.data.repo} target="_blank" rel="noreferrer"><Github size={18} />Repo</a>}
+          {item.data.demo && <a class="button" href={item.data.demo} target="_blank" rel="noreferrer"><ExternalLink size={18} />Demo</a>}
+        </div>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .project-card {
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+</style>

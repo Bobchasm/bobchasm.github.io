@@ -1,0 +1,18 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+
+const posts = (await getCollection('blog')).filter((item) => !item.data.draft).sort((a, b) => +b.data.date - +a.data.date);
+---
+
+<BaseLayout title="博客 | BobChasm">
+  <div class="site-shell page-title">
+    <div class="eyebrow">Blog</div>
+    <h1>技术记录与阶段性思考</h1>
+    <p>这里放较完整的问题复盘、工程实践、工具记录和长一点的想法。</p>
+  </div>
+  <section class="site-shell grid two">
+    {posts.map((item) => <ArticleCard item={item} href={`/blog/${item.slug}/`} />)}
+  </section>
+</BaseLayout>

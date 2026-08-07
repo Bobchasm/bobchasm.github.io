@@ -1,0 +1,454 @@
+---
+import { getCollection } from 'astro:content';
+import { Code2, FileText, Github, Mail, MapPin, School, Sparkles } from 'lucide-astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).filter((item) => !item.data.draft);
+const publications = [
+  {
+    title: 'Publication Title Placeholder',
+    authors: 'BobChasm, Collaborator A, Collaborator B',
+    venue: 'Conference / Journal, Year',
+    links: ['Paper', 'Code']
+  }
+];
+
+const footerLinks = [
+  { href: '/blog/', label: 'Technical Blog' },
+  { href: '/notes/', label: 'Learning Notes' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/moments/', label: 'Moments' }
+];
+---
+
+<BaseLayout title="BobChasm" description="Academic homepage of BobChasm." showHeader={false} showOwnerDock={false} footerId="links" footerLinks={footerLinks}>
+  <nav class="section-rail" aria-label="Section navigation">
+    <span class="rail-thumb" data-rail-thumb></span>
+    <a href="#education" title="Education" data-section-link="education" aria-current="true"><span>Edu</span></a>
+    <a href="#publications" title="Publications" data-section-link="publications"><span>Pub</span></a>
+    <a href="#projects" title="Projects" data-section-link="projects"><span>Pro</span></a>
+    <a href="#awards" title="Awards" data-section-link="awards"><span>Awd</span></a>
+    <a href="#links" title="Links" data-section-link="links"><span>Link</span></a>
+  </nav>
+
+  <a class="space-gate" href="/space/" title="Personal space" aria-label="Personal space">
+    <Sparkles size={16} />
+  </a>
+
+  <section class="intro-band">
+    <div class="site-shell intro-grid">
+      <aside class="profile-card" aria-label="Profile information">
+        <img src="/images/avatar.jpg" alt="BobChasm portrait" />
+        <div class="profile-facts">
+          <p><span class="fact-icon"><MapPin size={14} /></span><span>Tianjin, China</span></p>
+          <p><span class="fact-icon"><School size={14} /></span><span>Tianjin University</span></p>
+          <a href="mailto:daimingjing142857@tju.edu.cn"><span class="fact-icon"><Mail size={14} /></span><span>daimingjing142857@tju.edu.cn</span></a>
+          <a href="https://github.com/bobchasm" target="_blank" rel="noreferrer"><span class="fact-icon github-mark"><Github size={15} /></span><span>Bobchasm</span></a>
+        </div>
+      </aside>
+
+      <div class="intro-copy">
+        <h1>BobChasm</h1>
+        <p class="role">Student / Researcher in progress</p>
+        <p>
+          I am interested in computer science, mathematics, physics, and the systems that turn ideas into working artifacts.
+          This page will collect my education, publications, projects, and selected links.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <main class="site-shell academic-main">
+    <section id="education" class="academic-section">
+      <div class="section-label">Education</div>
+      <div class="section-body">
+        <ol class="timeline">
+          <li>
+            <span class="time">2023.8 - Present</span>
+            <p>Undergraduate in the School of Software, Tianjin University. Majoring in Software Engineering, minoring in Mathematics and Applied Mathematics.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="publications" class="academic-section">
+      <div class="section-label">Publications</div>
+      <div class="section-body">
+        <div class="publication-list">
+          {publications.map((item) => (
+            <article class="publication-item">
+              <h2>{item.title}</h2>
+              <p>{item.authors}</p>
+              <p><em>{item.venue}</em></p>
+              <div class="inline-links">
+                {item.links.map((link) => (
+                  <a href="#">
+                    {link === 'Code' ? <Code2 size={15} /> : <FileText size={15} />}
+                    {link}
+                  </a>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="academic-section">
+      <div class="section-label">Projects</div>
+      <div class="section-body">
+        <div class="project-list">
+          {projects.slice(0, 4).map((project) => (
+            <a class="project-item" href={`/projects/${project.slug}/`}>
+              <strong>{project.data.title}</strong>
+              <span>{project.data.description}</span>
+              <small>{project.data.tech.join(' / ')}</small>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section id="awards" class="academic-section">
+      <div class="section-label">Awards</div>
+      <div class="section-body">
+        <div class="award-list">
+          <article>
+            <div>
+              <h2>Merit Student, Tianjin University</h2>
+              <p>Academic years 2023-2024 and 2024-2025.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  const railLinks = Array.from(document.querySelectorAll('[data-section-link]'));
+  const thumb = document.querySelector('[data-rail-thumb]');
+  const sections = railLinks
+    .map((link) => document.getElementById(link.getAttribute('data-section-link') || ''))
+    .filter(Boolean);
+
+  const setActiveSection = (id) => {
+    const activeIndex = railLinks.findIndex((link) => link.getAttribute('data-section-link') === id);
+    railLinks.forEach((link) => {
+      link.toggleAttribute('aria-current', link.getAttribute('data-section-link') === id);
+    });
+
+    if (thumb && activeIndex >= 0) {
+      thumb.style.transform = `translateY(${activeIndex * 34}px)`;
+    }
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+      if (visible?.target?.id) {
+        setActiveSection(visible.target.id);
+      }
+    },
+    {
+      rootMargin: '-34% 0px -50% 0px',
+      threshold: [0.12, 0.28, 0.5, 0.75]
+    }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+</script>
+
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .intro-band {
+    background: #f3ecd7;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: 268px minmax(0, 1fr);
+    gap: 34px;
+    align-items: center;
+    padding: 44px 0;
+  }
+
+  .profile-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  .profile-card img {
+    width: 236px;
+    aspect-ratio: 1;
+    object-fit: cover;
+    object-position: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: var(--shadow);
+    justify-self: center;
+  }
+
+  .profile-facts {
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(87, 79, 61, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.62);
+    padding: 9px;
+    color: #454039;
+    font-size: 0.82rem;
+    box-shadow: 0 8px 24px rgba(45, 38, 26, 0.06);
+  }
+
+  .profile-facts p,
+  .profile-facts a {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .profile-facts span:last-child {
+    overflow-wrap: anywhere;
+  }
+
+  .fact-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    background: #f7f4ee;
+    color: var(--accent-strong);
+    border: 1px solid rgba(37, 109, 90, 0.18);
+  }
+
+  .github-mark {
+    background: #f7f4ee;
+    color: var(--accent-strong);
+    border-color: rgba(37, 109, 90, 0.18);
+  }
+
+  .intro-copy h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    line-height: 1.12;
+  }
+
+  .role {
+    margin: 0 0 18px;
+    color: var(--accent-strong);
+    font-size: 1.18rem;
+    font-weight: 720;
+  }
+
+  .intro-copy p:not(.role) {
+    max-width: 760px;
+    margin: 0;
+    color: #38352f;
+    font-size: 1.06rem;
+  }
+
+  .space-gate {
+    position: fixed;
+    right: max(18px, env(safe-area-inset-right));
+    top: max(18px, env(safe-area-inset-top));
+    z-index: 48;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(23, 23, 23, 0.18);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--warm);
+    box-shadow: 0 8px 22px rgba(23, 23, 23, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .section-rail {
+    position: fixed;
+    left: max(14px, env(safe-area-inset-left));
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 45;
+    display: grid;
+    gap: 6px;
+    padding: 8px 7px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(251, 250, 247, 0.88);
+    box-shadow: 0 14px 34px rgba(23, 23, 23, 0.1);
+    backdrop-filter: blur(12px);
+    isolation: isolate;
+  }
+
+  .rail-thumb {
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    width: 38px;
+    height: 28px;
+    border-radius: 999px;
+    background: #d9ccbb;
+    transition: transform 180ms ease;
+    z-index: 0;
+  }
+
+  .section-rail a {
+    position: relative;
+    z-index: 1;
+    width: 38px;
+    height: 28px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 760;
+    transition: color 180ms ease;
+  }
+
+  .section-rail a:hover,
+  .section-rail a[aria-current="true"] {
+    color: var(--ink);
+  }
+
+  .academic-main {
+    padding: 26px 0 20px;
+  }
+
+  .academic-section {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 32px;
+    border-bottom: 1px solid var(--line);
+    padding: 34px 0;
+    scroll-margin-top: 24px;
+  }
+
+  .section-label {
+    color: var(--warm);
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  .section-body h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .publication-item h2 {
+    font-size: 0.98rem;
+  }
+
+  .section-body p {
+    color: var(--muted);
+    margin: 0;
+  }
+
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 24px;
+  }
+
+  .time {
+    display: block;
+    color: var(--accent-strong);
+    font-size: 0.9rem;
+    font-weight: 760;
+    margin-bottom: 4px;
+  }
+
+  .publication-list,
+  .project-list,
+  .award-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .publication-item,
+  .award-list article,
+  .project-item {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 14px;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .award-list article {
+    color: var(--accent-strong);
+  }
+
+  .award-list p {
+    color: var(--muted);
+  }
+
+  .inline-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .inline-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .inline-links a {
+    color: var(--accent-strong);
+    font-weight: 700;
+  }
+
+  .project-item {
+    display: grid;
+    gap: 4px;
+  }
+
+  .project-item span {
+    color: var(--muted);
+  }
+
+  .project-item small {
+    color: var(--warm);
+    font-weight: 700;
+  }
+
+  @media (max-width: 920px) {
+    .section-rail {
+      display: none;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .intro-grid,
+    .academic-section {
+      grid-template-columns: 1fr;
+    }
+
+    .intro-grid {
+      gap: 28px;
+    }
+
+    .profile-card {
+      max-width: 220px;
+    }
+  }
+</style>
