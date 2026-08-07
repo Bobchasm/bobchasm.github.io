@@ -6,7 +6,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const projects = (await getCollection('projects')).filter((item) => !item.data.draft).sort((a, b) => Number(b.data.featured) - Number(a.data.featured));
 ---
 
-<BaseLayout title="项目 | BobChasm">
+<BaseLayout title="项目 | Bobchasm">
   <div class="site-shell page-title">
     <div class="eyebrow">Projects</div>
     <h1>想展示的项目和实验</h1>

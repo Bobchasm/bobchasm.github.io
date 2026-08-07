@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-astro';
 import OwnerDock from '../components/OwnerDock.astro';
 
 const {
-  title = 'BobChasm',
+  title = 'Bobchasm',
   description = 'Personal homepage, notes, projects and moments.',
   showHeader = true,
   showOwnerDock = true,
@@ -31,15 +31,17 @@ const lastUpdated = new Date().toISOString().slice(0, 10);
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/images/avatar.jpg" />
+    <link rel="apple-touch-icon" href="/images/avatar.jpg" />
     <title>{title}</title>
   </head>
   <body>
     {showHeader && (
       <header class="site-header">
         <div class="site-shell nav">
-          <a class="brand" href="/" aria-label="BobChasm home">
+          <a class="brand" href="/" aria-label="Bobchasm home">
             <span class="brand-mark">BC</span>
-            <span>BobChasm</span>
+            <span>Bobchasm</span>
           </a>
           <nav class="nav-links" aria-label="Primary">
             {nav.map(([href, label]) => (

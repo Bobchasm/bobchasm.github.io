@@ -15,7 +15,7 @@ const notes = (await getCollection('notes'))
   .sort((a, b) => a.data.order - b.data.order || +b.data.date - +a.data.date);
 ---
 
-<BaseLayout title={`${labels[category]} 笔记 | BobChasm`}>
+<BaseLayout title={`${labels[category]} 笔记 | Bobchasm`}>
   <div class="site-shell page-title">
     <div class="eyebrow">Notes</div>
     <h1>{labels[category]} 笔记</h1>
